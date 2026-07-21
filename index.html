@@ -175,6 +175,22 @@
   .ecard .el{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:6px 0 10px}
   .ecard p{font-size:.84rem;color:#a8a8a8;line-height:1.5}
   @media(max-width:620px){.earn-grid{grid-template-columns:1fr}}
+
+  /* CASH POT */
+  .cashpot{display:flex;flex-direction:column;gap:12px}
+  .cp-main{border:2px solid var(--gold);border-radius:12px;background:rgba(201,162,75,.1);padding:22px;text-align:center;box-shadow:0 0 30px rgba(201,162,75,.14)}
+  .cp-lbl{font-size:.68rem;letter-spacing:.12em;color:var(--gold);margin-bottom:6px}
+  .cp-amt{font-size:2.8rem;font-weight:800;line-height:1;color:#fff;font-variant-numeric:tabular-nums}
+  .cp-sub{font-size:.82rem;color:#a8a8a8;margin-top:10px;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.5}
+  .cp-sub b{color:var(--gold)}
+  .cp-tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .cp-tier{border:1px solid #2a2a2a;border-radius:8px;padding:12px 8px;text-align:center;transition:all .3s ease;display:flex;flex-direction:column;gap:1px}
+  .cp-tier.hot{border-color:var(--gold);background:rgba(201,162,75,.08)}
+  .cpt-n{font-size:1.05rem;font-weight:800;color:#fff}
+  .cp-tier.hot .cpt-n{color:var(--gold)}
+  .cpt-d{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .cpt-p{font-size:.74rem;color:#999;margin-top:4px}
+  .cp-tier.hot .cpt-p{color:var(--gold-hi)}
 </style>
 </head>
 <body>
@@ -292,7 +308,7 @@
         <span id="nextunlock"><b>357 more</b> unlocks ULTIMATE</span>
       </div>
 
-      <div class="ladder">
+      <div class="ladder" id="giftladder">
         <div class="tier locked" id="t-ult">
           <div class="lbl">ULTIMATE · locked · 1,500 backers</div>
           <div class="gift">7 Nights, Sandals Curaçao</div>
@@ -308,14 +324,28 @@
         </div>
       </div>
 
+      <!-- CASH POT (shown in cash mode) -->
+      <div class="cashpot" id="cashpot" style="display:none">
+        <div class="cp-main">
+          <div class="cp-lbl">● THE POT · WHAT THE WINNING CALLER TAKES</div>
+          <div class="cp-amt">$<span id="cp-amount">15,050</span></div>
+          <div class="cp-sub">Set by the <b>smaller side</b> — <span id="cp-smaller">505</span> backers × $50. The bigger side's overflow can never be won; it clears to the house.</div>
+        </div>
+        <div class="cp-tiers">
+          <div class="cp-tier" id="cpt-1"><span class="cpt-n">500+</span><span class="cpt-d">backers</span><span class="cpt-p">~$25k pots</span></div>
+          <div class="cp-tier" id="cpt-2"><span class="cpt-n">1,500+</span><span class="cpt-d">backers</span><span class="cpt-p">~$75k pots</span></div>
+          <div class="cp-tier" id="cpt-3"><span class="cpt-n">3,000+</span><span class="cpt-d">backers</span><span class="cpt-p">$150k+ pots</span></div>
+        </div>
+      </div>
+
       <!-- THE WOW -->
       <div class="wow">
         <div class="wlbl">
-          <span class="t">Drag to grow the crowd</span>
+          <span class="t" id="wow-t">Drag to grow the crowd</span>
           <span class="v"><span id="wowval">1,143</span> backers</span>
         </div>
         <input type="range" min="200" max="2400" value="1143" id="slider">
-        <p class="hint">More backers unlock a bigger gift — which is why every backer <b>recruits the next one</b>. This is the engine.</p>
+        <p class="hint" id="wow-hint">More backers unlock a bigger gift — which is why every backer <b>recruits the next one</b>. This is the engine.</p>
       </div>
     </div>
   </div>
@@ -455,9 +485,26 @@
     if(flag){ flag.textContent = isGift
       ? '● HIGH ROLLER · GIFT · backing open'
       : '● HIGH ROLLER · $50 CASH · backing open'; }
+
+    // swap the slider display: gift ladder <-> cash pot
+    currentMode = mode;
+    var gl=document.getElementById('giftladder');
+    var cp=document.getElementById('cashpot');
+    var wt=document.getElementById('wow-t');
+    var wh=document.getElementById('wow-hint');
+    if(gl&&cp){
+      gl.style.display=isGift?'':'none';
+      cp.style.display=isGift?'none':'';
+    }
+    if(wt) wt.textContent=isGift?'Drag to grow the crowd':'Drag to grow the crowd';
+    if(wh) wh.innerHTML=isGift
+      ? 'More backers unlock a bigger gift — which is why every backer <b>recruits the next one</b>. This is the engine.'
+      : 'A bigger crowd means a bigger pot — but only the <b>smaller side</b> is ever winnable. That is why the house can never lose.';
+    // re-render at current slider value so the right display updates
+    if(typeof render==='function' && slider) render(parseInt(slider.value,10));
   }
 
-  // THE WOW: drag backers -> gift ladder unlocks live
+  // THE WOW: drag backers -> gift ladder (gift mode) OR cash pot (cash mode)
   var slider=document.getElementById('slider');
   var wowval=document.getElementById('wowval');
   var total=document.getElementById('total');
@@ -467,6 +514,16 @@
   var tUlt=document.getElementById('t-ult');
   var tPrem=document.getElementById('t-prem');
   var tBasic=document.getElementById('t-basic');
+  var giftladder=document.getElementById('giftladder');
+  var cashpot=document.getElementById('cashpot');
+  var cpAmount=document.getElementById('cp-amount');
+  var cpSmaller=document.getElementById('cp-smaller');
+  var cpt1=document.getElementById('cpt-1'),cpt2=document.getElementById('cpt-2'),cpt3=document.getElementById('cpt-3');
+  var wowT=document.getElementById('wow-t');
+  var wowHint=document.getElementById('wow-hint');
+
+  var currentMode='gift';
+  var STAKE=50; // High Roller
 
   var PREMIUM=1000, ULTIMATE=1500;
 
@@ -488,6 +545,22 @@
     var pct=((n-200)/(2400-200))*100;
     slider.style.background='linear-gradient(90deg,var(--gold) 0%,var(--gold) '+pct+'%,#2a2a2a '+pct+'%)';
 
+    if(currentMode==='cash'){
+      // POT = smaller side count * stake. That is all that can ever be won.
+      var smaller=Math.min(b,l);
+      var pot=smaller*STAKE;
+      cpAmount.textContent=pot.toLocaleString();
+      cpSmaller.textContent=smaller.toLocaleString();
+      // highlight which crowd tier we're in (by total backers)
+      cpt1.classList.toggle('hot', n<1500);
+      cpt2.classList.toggle('hot', n>=1500 && n<3000);
+      cpt3.classList.toggle('hot', n>=3000);
+      // cash mode's meta line
+      nextunlock.innerHTML='<b>$'+pot.toLocaleString()+'</b> in play · set by the smaller side';
+      return;
+    }
+
+    // GIFT MODE: the gift ladder
     if(n>=ULTIMATE){
       setTier(tUlt,'active','● ACTIVE NOW · ULTIMATE','7 Nights, Sandals Curaçao','unlocked at 1,500 backers');
       setTier(tPrem,'cleared','PREMIUM · cleared','Two First-Class Plane Tickets');
