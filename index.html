@@ -141,6 +141,40 @@
   footer{border-top:1px solid rgba(201,162,75,.14);padding:28px 22px;text-align:center;color:#777;font-size:.78rem}
   footer .ft-brand{color:var(--gold);font-weight:700;letter-spacing:.02em}
   .disc{max-width:640px;margin:10px auto 0;font-size:.7rem;color:#555;line-height:1.5}
+
+  /* MODE TOGGLE */
+  .modewrap{margin-top:30px;text-align:center}
+  .modetoggle{display:inline-flex;border:1px solid var(--line);border-radius:12px;padding:5px;background:var(--panel);gap:4px}
+  .modebtn{display:flex;flex-direction:column;align-items:center;gap:1px;background:none;border:none;cursor:pointer;font-family:inherit;color:#8a8a8a;padding:10px 26px;border-radius:9px;transition:all .2s ease}
+  .modebtn .mb-t{font-weight:800;font-size:1rem;letter-spacing:.06em}
+  .modebtn .mb-s{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;opacity:.8}
+  .modebtn.active{background:linear-gradient(90deg,var(--gold-lo),var(--gold),var(--gold-hi));color:#000}
+  .modebtn:not(.active):hover{color:var(--gold)}
+  .modehint{margin-top:12px;font-size:.86rem;color:#9a9a9a;max-width:520px;margin-left:auto;margin-right:auto}
+
+  /* SETTLEMENT PANELS */
+  .flowrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+  .flowcard{border:1px solid #2a2a2a;border-radius:12px;padding:20px;background:var(--panel)}
+  .flowcard.win{border-color:var(--gold);background:rgba(201,162,75,.08)}
+  .flowcard.lose{border-color:rgba(200,80,80,.5);background:rgba(160,50,50,.06)}
+  .flowcard .fh{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .flowcard.win .fh{color:var(--gold)}
+  .flowcard.lose .fh{color:#d98a8a}
+  .flowcard p{font-size:.9rem;color:#c4c4c4;line-height:1.55}
+  .flowcard b{color:#fff}
+  .ftag{margin-top:12px;font-size:.74rem;font-weight:700;letter-spacing:.04em;color:var(--gold);border-top:1px solid rgba(255,255,255,.07);padding-top:10px}
+  .ftag.neutral{color:#9a9a9a}
+  .ftag.danger{color:#e08a8a}
+  .settle-note{text-align:center;font-size:.86rem;color:#999;max-width:600px;margin:0 auto;line-height:1.6}
+  @media(max-width:620px){.flowrow{grid-template-columns:1fr}}
+
+  /* EARN GRID */
+  .earn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .ecard{border:1px solid var(--line);border-radius:12px;padding:22px 18px;text-align:center}
+  .ecard .en{font-size:2.2rem;font-weight:800;line-height:1;background:linear-gradient(90deg,var(--gold-lo),var(--gold),var(--gold-hi));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .ecard .el{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:6px 0 10px}
+  .ecard p{font-size:.84rem;color:#a8a8a8;line-height:1.5}
+  @media(max-width:620px){.earn-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -164,7 +198,64 @@
     <span><b>1,880</b> on deck</span><span class="dot">•</span>
     <span><b>4</b> continents</span>
   </div>
+
+  <!-- MODE TOGGLE -->
+  <div class="modewrap">
+    <div class="modetoggle" role="tablist" aria-label="Choose market">
+      <button class="modebtn active" id="btn-gift" role="tab" aria-selected="true" onclick="setMode('gift')">
+        <span class="mb-t">GIFT</span><span class="mb-s">U.S. Market</span>
+      </button>
+      <button class="modebtn" id="btn-cash" role="tab" aria-selected="false" onclick="setMode('cash')">
+        <span class="mb-t">CASH</span><span class="mb-s">Global Market</span>
+      </button>
+    </div>
+    <p class="modehint" id="modehint">No one's Backing funds are ever at risk. Winners get the gift on top.</p>
+  </div>
 </header>
+
+<!-- HOW SETTLEMENT WORKS (mode-aware) -->
+<section id="settle">
+  <div class="wrap">
+    <p class="eyebrow" style="text-align:center" id="settle-eyebrow">How It Settles · Gift Market</p>
+    <h2 class="stitle" id="settle-title">Everybody's funds come home. Winners get the gift.</h2>
+    <p class="slead" id="settle-lead">In the U.S. Gift market, Backing is never a wager — it's support. Nobody can lose their money.</p>
+
+    <!-- GIFT PANEL -->
+    <div class="settle-panel" id="panel-gift">
+      <div class="flowrow">
+        <div class="flowcard win">
+          <div class="fh">Winning side</div>
+          <p>Every Backer gets their <b>full Backing funds returned</b> — and the winning side unlocks the <b>sponsor-funded gift</b> (the ladder below).</p>
+          <div class="ftag">Funds back + Gift</div>
+        </div>
+        <div class="flowcard">
+          <div class="fh">Losing side</div>
+          <p>Every Backer gets their <b>full Backing funds returned</b>. No gift — but nothing lost.</p>
+          <div class="ftag neutral">Funds back</div>
+        </div>
+      </div>
+      <p class="settle-note">No funds are ever at risk — so this is participation, not wagering. It reaches the four-in-five who would never open a sportsbook, and the house earns the same small fee on every Backing whether a side wins or loses.</p>
+    </div>
+
+    <!-- CASH PANEL -->
+    <div class="settle-panel" id="panel-cash" style="display:none">
+      <div class="flowrow">
+        <div class="flowcard win">
+          <div class="fh">Winning side</div>
+          <p>Backers get their <b>Backing funds returned</b>. The winning <b>Caller</b> takes the pot — sized to the smaller side — plus the gift rides on top.</p>
+          <div class="ftag">Funds back → Caller wins the pot</div>
+        </div>
+        <div class="flowcard lose">
+          <div class="fh">Losing side</div>
+          <p>Backers <b>forfeit their Backing funds</b> — which flow to the winning Caller. This is real-money play, licensed jurisdictions only.</p>
+          <div class="ftag danger">Funds forfeited → to the winner</div>
+        </div>
+      </div>
+      <p class="settle-note">The house never takes a side and never sets odds — it earns the same small fee on every Backing, win or lose. It is structurally impossible for the house to profit from any Backer's loss. Cash play runs only where licensed.</p>
+    </div>
+  </div>
+</section>
+<!-- END SETTLEMENT -->
 
 <!-- CALL ROOM + WOW -->
 <section id="room">
@@ -175,7 +266,7 @@
 
     <div class="room">
       <div class="room-top">
-        <span class="room-flag">● HIGH ROLLER · $50 CALL · backing open</span>
+        <span class="room-flag" id="roomflag">● HIGH ROLLER · GIFT · backing open</span>
         <span class="room-clock" id="gameclock">LIVE · Q2 08:14</span>
       </div>
       <div class="room-h">@JimC's CALL ROOM</div>
@@ -226,6 +317,20 @@
         <input type="range" min="200" max="2400" value="1143" id="slider">
         <p class="hint">More backers unlock a bigger gift — which is why every backer <b>recruits the next one</b>. This is the engine.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- WAYS TO EARN A CALL -->
+<section id="earn">
+  <div class="wrap">
+    <p class="eyebrow" style="text-align:center">The Flywheel</p>
+    <h2 class="stitle">You earn your way onto the stage</h2>
+    <p class="slead">CALLs aren't just bought — they're earned by being the crowd. Every path below mints a new CALL you can use now or bank in your back office.</p>
+    <div class="earn-grid">
+      <div class="ecard"><div class="en">3</div><div class="el">Backings</div><p>Back three CALLs → earn one of your own. Being the crowd is the price of the stage.</p></div>
+      <div class="ecard"><div class="en">5</div><div class="el">Gifts sent</div><p>Send five Gifts to new people → earn a CALL. You're growing the room.</p></div>
+      <div class="ecard"><div class="en">1</div><div class="el">New wallet</div><p>Every Gift that becomes a new verified wallet → earn a CALL. The loop pays you to build it.</p></div>
     </div>
   </div>
 </section>
@@ -320,6 +425,38 @@
 </footer>
 
 <script>
+  // MODE TOGGLE: gift (US) <-> cash (global)
+  function setMode(mode){
+    var isGift = mode==='gift';
+    document.getElementById('btn-gift').classList.toggle('active',isGift);
+    document.getElementById('btn-cash').classList.toggle('active',!isGift);
+    document.getElementById('btn-gift').setAttribute('aria-selected',isGift);
+    document.getElementById('btn-cash').setAttribute('aria-selected',!isGift);
+    document.getElementById('panel-gift').style.display=isGift?'':'none';
+    document.getElementById('panel-cash').style.display=isGift?'none':'';
+
+    var hint=document.getElementById('modehint');
+    var eb=document.getElementById('settle-eyebrow');
+    var ti=document.getElementById('settle-title');
+    var ld=document.getElementById('settle-lead');
+    if(isGift){
+      hint.textContent="No one's Backing funds are ever at risk. Winners get the gift on top.";
+      eb.textContent='How It Settles · Gift Market';
+      ti.textContent="Everybody's funds come home. Winners get the gift.";
+      ld.textContent="In the U.S. Gift market, Backing is never a wager — it's support. Nobody can lose their money.";
+    } else {
+      hint.textContent="Real money. Winners keep their funds; the losing side's funds go to the winning Caller.";
+      eb.textContent='How It Settles · Cash Market';
+      ti.textContent="Winners take the pot. Licensed jurisdictions only.";
+      ld.textContent="In the global Cash market, the winning Caller takes the smaller-side pot. The house never fades a soul — it earns only the participation fee.";
+    }
+    // update CALL ROOM flag if present
+    var flag=document.getElementById('roomflag');
+    if(flag){ flag.textContent = isGift
+      ? '● HIGH ROLLER · GIFT · backing open'
+      : '● HIGH ROLLER · $50 CASH · backing open'; }
+  }
+
   // THE WOW: drag backers -> gift ladder unlocks live
   var slider=document.getElementById('slider');
   var wowval=document.getElementById('wowval');
