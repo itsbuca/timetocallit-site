@@ -329,7 +329,7 @@
         <div class="cp-main">
           <div class="cp-lbl">● THE POT · WHAT THE WINNING CALLER TAKES</div>
           <div class="cp-amt">$<span id="cp-amount">15,050</span></div>
-          <div class="cp-sub">Set by the <b>smaller side</b> — <span id="cp-smaller">505</span> backers × $50. The bigger side's overflow can never be won; it clears to the house.</div>
+          <div class="cp-sub">Set by the <b>smaller side</b> — <span id="cp-smaller">505</span> backers × $50 — so every pot is fully backed on both sides.</div>
         </div>
         <div class="cp-tiers">
           <div class="cp-tier" id="cpt-1"><span class="cpt-n">500+</span><span class="cpt-d">backers</span><span class="cpt-p">~$25k pots</span></div>
@@ -499,7 +499,7 @@
     if(wt) wt.textContent=isGift?'Drag to grow the crowd':'Drag to grow the crowd';
     if(wh) wh.innerHTML=isGift
       ? 'More backers unlock a bigger gift — which is why every backer <b>recruits the next one</b>. This is the engine.'
-      : 'A bigger crowd means a bigger pot. Every backer who recruits the next one grows what's on the line — that's the engine.';
+      : 'A bigger crowd means a bigger pot. Every backer who <b>recruits the next one</b> grows what is on the line — that is the engine.';
     // re-render at current slider value so the right display updates
     if(typeof render==='function' && slider) render(parseInt(slider.value,10));
   }
